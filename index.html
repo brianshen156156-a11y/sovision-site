@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>所見行銷 Sovision｜短影音代操，讓影片帶來詢問</title>
+<meta name="description" content="所見行銷幫店家與品牌做短影音代操：企劃腳本、拍攝剪輯、排程發文、成效追蹤整套接手。旅遊業者合作後累積 1000+ 諮詢名單。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF1F5; --panel:#FFFFFF; --ink:#14213D; --muted:#56607A; --line:#DDE2EA; --dash:#A9B2C3;
+  --red:#CC3320; --red-deep:#A8281A; --unread:#F7F9FC; --bubble:#E8ECF2;
+  --sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --num:"Manrope",var(--sans);
+  --r-lg:28px; --r-md:18px;
+  --gutter:48px; --max:1240px;
+  --press:cubic-bezier(.3,1.6,.5,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{overflow-x:clip;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased}
+h1,h2,h3,p{text-wrap:pretty}
+img{display:block;max-width:100%}
+a{color:inherit}
+.nw{white-space:nowrap}
+.skip{position:absolute;left:-999px;top:8px;background:var(--ink);color:#fff;padding:8px 14px;border-radius:8px;z-index:99}
+.skip:focus{left:8px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 var(--gutter)}
+:focus-visible{outline:3px solid var(--ink);outline-offset:3px;border-radius:6px}
+
+/* 傳送鍵：全頁唯一的紅色按鈕，按下陷一下、箭頭往右送出 */
+.send{display:inline-flex;align-items:center;gap:10px;height:54px;padding:0 28px;border-radius:27px;background:var(--red);color:#fff;font-weight:700;font-size:17px;text-decoration:none;white-space:nowrap;border:0;cursor:pointer;font-family:inherit;transition:transform .18s var(--press),background .2s}
+.send svg{width:18px;height:18px;transition:transform .25s var(--press)}
+.send:hover{background:var(--red-deep)}
+.send:hover svg{transform:translateX(3px)}
+.send:active{transform:scale(.95)}
+.send.sent svg{animation:fly .45s ease-in forwards}
+@keyframes fly{0%{transform:translateX(0)}60%{transform:translateX(26px);opacity:0}61%{transform:translateX(-14px);opacity:0}100%{transform:translateX(0);opacity:1}}
+.link{font-weight:700;text-decoration:none;border-bottom:2px solid var(--line);padding-bottom:2px;transition:border-color .2s}
+.link:hover{border-color:var(--ink)}
+
+/* 頂欄 */
+.top{position:sticky;top:0;z-index:30;background:rgba(238,241,245,.92);backdrop-filter:saturate(1.4) blur(10px)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;height:72px}
+.brand{display:flex;align-items:baseline;gap:8px;text-decoration:none;font-weight:900;font-size:21px}
+.brand i{width:9px;height:9px;border-radius:50%;background:var(--red);display:inline-block;transform:translateY(-3px)}
+.brand small{font-family:var(--num);font-weight:700;font-size:11px;letter-spacing:.18em;color:var(--muted)}
+.top nav{display:flex;gap:30px;font-size:15px}
+.top nav a{text-decoration:none;color:var(--muted);font-weight:500}
+.top nav a:hover{color:var(--ink)}
+.top .send{height:44px;padding:0 20px;font-size:15px}
+
+/* 首屏：收件匣，主角是「影片＋影片底下的提問」 */
+.hero{padding:8px 0 0}
+.inbox{background:var(--panel);border-radius:var(--r-lg);box-shadow:0 1px 0 var(--line),0 40px 70px -40px rgba(20,33,61,.3);overflow:hidden}
+.inbox-head{padding:36px 52px 26px;border-bottom:1px solid var(--line)}
+.folder{display:inline-flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:var(--muted)}
+.folder b{color:#fff;background:var(--red);border-radius:999px;font-family:var(--num);font-size:12px;min-width:22px;height:22px;line-height:22px;text-align:center;padding:0 7px;display:inline-block}
+h1{font-size:clamp(40px,5.2vw,72px);line-height:1.12;font-weight:900;margin-top:18px}
+h1 .ln{display:block;overflow:hidden}
+h1 .ln span{display:inline-block}
+h1 b{color:var(--red)}
+.lead{margin-top:12px;font-size:19px;color:var(--muted);max-width:32em}
+.msgs{list-style:none;display:grid;grid-template-columns:1fr 1fr}
+.msg{display:grid;grid-template-columns:84px 1fr 10px;gap:18px;align-items:start;padding:20px 28px 20px 52px;border-bottom:1px solid var(--line);background:var(--panel)}
+.msg:nth-child(odd){border-right:1px solid var(--line)}
+.msg:nth-child(even){padding-left:32px}
+.msg.new{background:var(--unread)}
+.vid{position:relative;width:84px;aspect-ratio:9/16;border-radius:12px;overflow:hidden;background:var(--bubble)}
+.vid img{width:100%;height:100%;object-fit:cover}
+.vid span{position:absolute;left:6px;bottom:6px;display:flex;align-items:center;gap:3px;color:#fff;font-family:var(--num);font-weight:700;font-size:12px;text-shadow:0 1px 3px rgba(0,0,0,.7)}
+.vid svg{width:11px;height:11px}
+.who{font-size:14px;color:var(--muted);line-height:1.5}
+.who b{color:var(--ink);margin-right:6px}
+.text{display:inline-block;margin-top:10px;background:var(--bubble);border-radius:4px 18px 18px 18px;padding:12px 16px;font-size:18px;font-weight:500;line-height:1.5}
+.dot{width:10px;height:10px;border-radius:50%;margin-top:6px}
+.new .dot{background:var(--red)}
+.reply{display:flex;align-items:center;gap:16px;padding:18px 24px 18px 52px}
+.reply .field{flex:1;height:54px;border-radius:27px;background:var(--bg);display:flex;align-items:center;padding:0 24px;color:var(--muted);font-size:17px}
+
+/* 共用區塊標題 */
+.sec{padding:140px 0 0}
+.sec-head{max-width:780px}
+h2{font-size:clamp(32px,4vw,52px);line-height:1.25;font-weight:900}
+h2 b{color:var(--red)}
+.sec-head p{margin-top:16px;color:var(--muted);font-size:18px}
+
+/* 草稿匣：每個卡點都是一則還沒送出去的草稿 */
+.drafts-label{margin-top:44px;font-size:15px;font-weight:700;color:var(--muted)}
+.drafts{list-style:none;margin-top:14px;display:flex;flex-direction:column;gap:16px;max-width:780px}
+.d-bubble{border:1.5px dashed var(--dash);border-radius:22px 22px 22px 4px;padding:18px 26px;background:rgba(255,255,255,.55);transition:border-color .25s,background .25s}
+.draft:hover .d-bubble{border-color:var(--ink);background:#fff}
+.d-st{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:700;color:var(--muted)}
+.d-st svg{width:14px;height:14px}
+.d-bubble h3{font-size:22px;line-height:1.45;font-weight:700;margin-top:4px}
+.d-bubble p{color:var(--muted);margin-top:4px}
+
+/* 一支影片怎麼變成一則詢問（跟著捲動走） */
+.story{display:grid;grid-template-columns:1fr 1fr;gap:72px;margin-top:40px}
+.stage-col{position:relative}
+.stage{position:sticky;top:110px;height:calc(100vh - 150px);max-height:720px;display:grid;place-items:center start}
+.card{position:relative;width:min(330px,72%);aspect-ratio:9/16;border-radius:22px;background:var(--panel);box-shadow:0 30px 60px -30px rgba(20,33,61,.45)}
+.pile{position:absolute;inset:0;padding:22px 18px;display:flex;flex-direction:column;gap:12px}
+.pile .t,.script .t{font-size:13px;font-weight:700;color:var(--muted)}
+.pile .grid{flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:8px;min-height:0}
+.pile .grid img{width:100%;height:100%;object-fit:cover;border-radius:8px}
+.script{position:absolute;inset:0;padding:26px 22px;display:flex;flex-direction:column;gap:20px;border-radius:22px;background:var(--panel);z-index:1;clip-path:inset(100% 0 0 0)}
+.script .row{border-left:3px solid var(--line);padding-left:12px}
+.script .row b{display:block;font-size:13px;color:var(--muted)}
+.script .row span{font-size:17px;font-weight:700;line-height:1.45}
+.script .foot{margin-top:auto}
+.video{position:absolute;inset:0;border-radius:22px;overflow:hidden;clip-path:inset(100% 0 0 0);z-index:2}
+.video img{width:100%;height:100%;object-fit:cover}
+.chip{position:absolute;left:50%;top:-22px;transform:translateX(-50%);background:var(--ink);color:#fff;font-size:14px;font-weight:700;padding:8px 16px;border-radius:999px;white-space:nowrap;opacity:0;z-index:3}
+.bubble{position:absolute;right:-46%;max-width:250px;background:var(--panel);border-radius:16px 16px 16px 4px;padding:12px 16px;font-size:15px;line-height:1.5;box-shadow:0 14px 30px -16px rgba(20,33,61,.5);opacity:0;z-index:3}
+.bubble small{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);margin-bottom:2px}
+.bubble small i{width:7px;height:7px;border-radius:50%;background:var(--red)}
+.bubble.b1{top:16%}.bubble.b2{top:42%;right:-38%}.bubble.b3{top:66%;right:-50%}
+.steps{list-style:none;padding:10vh 0 34vh}
+.step{min-height:68vh;display:flex;flex-direction:column;justify-content:center}
+.step h3,.step .no{transition:color .35s}
+.step:not(.on) h3{color:#6E7891}
+.step:not(.on) .no{color:#5F6984}
+.step .no{font-family:var(--num);font-weight:800;font-size:15px;color:var(--ink)}
+.step h3{font-size:clamp(26px,2.6vw,34px);line-height:1.35;font-weight:900;margin-top:8px}
+.step p{margin-top:14px;color:var(--muted);font-size:18px;max-width:28em}
+.step .tags{margin-top:18px;font-size:15px;font-weight:500}
+
+/* 合作案例：大數字＋客戶帳號上的真實畫面 */
+.cases{margin-top:72px;display:grid;grid-template-columns:1fr 1fr;column-gap:72px;row-gap:110px}
+.case{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:end}
+.case.wide{grid-column:1 / -1;gap:72px}
+.case.flip .shots{order:-1}
+.case .big{font-family:var(--num);font-weight:800;font-size:clamp(56px,6vw,92px);line-height:1}
+.case .big sup{font-size:.4em;color:var(--muted);vertical-align:top}
+.case .big.word{font-family:var(--sans);font-weight:900;font-size:clamp(40px,4.4vw,64px)}
+.case .unit{font-size:18px;font-weight:700;margin-top:8px}
+.case .tag{margin-top:22px;font-size:15px;font-weight:700;color:var(--muted)}
+.case h3{font-size:22px;line-height:1.45;margin-top:4px}
+.case p{color:var(--muted);margin-top:10px}
+.shots{display:flex;gap:16px;align-items:flex-end}
+.shot{flex:1;border-radius:var(--r-md);overflow:hidden;box-shadow:0 24px 44px -26px rgba(20,33,61,.55);background:var(--panel)}
+.shot img{width:100%;height:100%;object-fit:cover}
+.shot.tall{aspect-ratio:9/16}
+.shot.port{aspect-ratio:3/4}
+.shot.wide{aspect-ratio:733/658}
+
+/* 適合對象：聯絡人名單 */
+.contacts{list-style:none;margin-top:48px;background:var(--panel);border-radius:var(--r-lg);box-shadow:0 1px 0 var(--line)}
+.contact{display:grid;grid-template-columns:76px minmax(220px,auto) 1fr;gap:28px;align-items:center;padding:28px 52px;border-bottom:1px solid var(--line)}
+.contact:last-child{border-bottom:0}
+.av{width:76px;height:76px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:30px;font-weight:900}
+.contact strong{font-size:clamp(30px,3.4vw,44px);font-weight:900;line-height:1.2}
+.contact span:not(.av){color:var(--muted);font-size:18px}
+
+/* 常見問題：對話串 */
+.thread{margin-top:48px;display:flex;flex-direction:column;gap:14px}
+.q,.a{max-width:min(62%,640px);padding:14px 20px;font-size:17px;line-height:1.65}
+.q{align-self:flex-end;background:var(--ink);color:#fff;border-radius:20px 20px 4px 20px;font-weight:500}
+.a{align-self:flex-start;background:var(--panel);border-radius:20px 20px 20px 4px;box-shadow:0 1px 0 var(--line)}
+.a + .q{margin-top:22px}
+.typing{align-self:flex-start;background:var(--panel);border-radius:20px 20px 20px 4px;padding:16px 18px;display:none;gap:5px}
+.typing i{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:bob 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes bob{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-4px);opacity:1}}
+
+/* 聯絡我們：回覆框 */
+.compose{margin-top:56px;background:var(--panel);border-radius:var(--r-lg);padding:48px 52px;display:grid;grid-template-columns:1.25fr 1fr;gap:56px;box-shadow:0 40px 70px -40px rgba(20,33,61,.3)}
+.compose h2{font-size:clamp(28px,3.2vw,42px)}
+.compose .desc{color:var(--muted);margin-top:14px}
+.quick{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+.quick button{font:inherit;font-size:15px;font-weight:500;background:var(--bg);color:var(--ink);border:1.5px solid transparent;border-radius:999px;padding:9px 16px;cursor:pointer;transition:border-color .2s,background .2s,transform .18s var(--press)}
+.quick button:hover{border-color:var(--ink)}
+.quick button:active{transform:scale(.96)}
+.quick button[aria-pressed="true"]{background:#fff;border-color:var(--ink)}
+.composer{margin-top:20px;display:flex;gap:12px;align-items:stretch}
+.composer textarea{flex:1;font:inherit;font-size:17px;border:1.5px solid var(--line);border-radius:22px;padding:14px 20px;resize:none;height:84px;background:var(--bg);color:var(--ink)}
+.composer textarea:focus{outline:none;border-color:var(--ink);background:#fff}
+.composer .send{height:auto}
+.hint{font-size:14px;color:var(--muted);margin-top:10px}
+.info{list-style:none;display:flex;flex-direction:column;gap:22px;border-left:1px solid var(--line);padding-left:40px}
+.info small{display:block;font-size:14px;color:var(--muted)}
+.info b,.info a.link{font-size:19px}
+
+/* 頁尾 */
+footer{margin-top:120px;padding:0 0 40px}
+.mark{font-weight:900;font-size:clamp(64px,12vw,180px);line-height:1;display:flex;align-items:baseline;gap:.12em}
+.mark i{width:.14em;height:.14em;border-radius:50%;background:var(--red);display:inline-block}
+.foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-top:28px;font-size:15px;color:var(--muted);border-top:1px solid var(--line);padding-top:20px}
+.legal{margin-top:10px;font-size:14px;color:var(--muted)}
+
+.toast{position:fixed;left:50%;bottom:28px;z-index:60;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:var(--ink);color:#fff;font-size:15px;font-weight:500;padding:12px 20px;border-radius:999px;max-width:calc(100% - 32px);text-align:center;transition:opacity .25s,transform .3s var(--press)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.dock{display:none}
+
+@media (max-width:900px){
+  :root{--gutter:16px}
+  body{font-size:16px}
+  .top .wrap{height:60px}
+  .top nav,.top .send{display:none}
+  .inbox{border-radius:22px}
+  .inbox-head{padding:24px 20px 20px}
+  h1{font-size:38px;margin-top:12px}
+  .lead{font-size:16px}
+  .msgs{grid-template-columns:1fr}
+  .msg,.msg:nth-child(even){grid-template-columns:62px 1fr 10px;gap:14px;padding:14px 20px;border-right:0}
+  .msg:nth-child(n+4){display:none}
+  .msgs.swap .msg:nth-child(4){display:grid}
+  .vid{width:62px}
+  .text{font-size:16px;padding:10px 14px;margin-top:6px}
+  .reply{padding:14px 16px;flex-wrap:wrap;gap:10px}
+  .reply .field{display:none}
+  .reply .send{flex:1;justify-content:center}
+  .reply .link{order:2;width:100%;text-align:center;border:0;padding:6px 0}
+  .sec{padding-top:96px}
+  .sec-head p{font-size:16px}
+  .drafts-label{margin-top:28px}
+  .drafts{gap:14px}
+  .d-bubble{padding:14px 18px}
+  .d-bubble h3{font-size:19px}
+  .d-bubble p{font-size:15px}
+  .story{display:block;margin-top:24px}
+  .stage-col{position:sticky;top:60px;z-index:2;overflow:clip;background:var(--bg);margin:0 calc(var(--gutter) * -1);padding:12px var(--gutter) 8px;box-shadow:0 12px 16px -14px rgba(20,33,61,.25)}
+  .stage{position:relative;top:auto;height:42vh;max-height:none;place-items:center}
+  .card{width:auto;height:84%;aspect-ratio:9/16}
+  .pile{padding:12px 10px;gap:8px}.pile .t,.script .t{font-size:11px}.pile .grid{gap:5px}
+  .script{padding:16px 12px;gap:8px}.script .opt,.script .foot{display:none}.script .row{padding-left:8px}.script .row b{font-size:11px}.script .row span{font-size:13px}
+  .chip{font-size:12px;padding:6px 12px;top:-16px}
+  .bubble{font-size:12px;max-width:132px;padding:9px 12px;right:-50%}
+  .bubble.b1{top:8%}.bubble.b2{right:auto;left:-54%;top:38%;border-radius:16px 16px 4px 16px}.bubble.b3{right:-50%;top:66%}
+  .steps{padding:4vh 0 24vh}
+  .step{min-height:56vh;justify-content:flex-start;padding-top:4vh}
+  .step p{font-size:16px}
+  .cases{grid-template-columns:1fr;row-gap:80px;margin-top:44px}
+  .case,.case.wide{grid-column:auto;grid-template-columns:1fr;gap:24px}
+  .case.flip .shots{order:0}
+  .shot.tall{flex:0 1 230px}
+  .contacts{margin-top:32px;border-radius:22px}
+  .contact{grid-template-columns:52px 1fr;gap:4px 16px;padding:20px}
+  .av{width:52px;height:52px;font-size:22px;grid-row:span 2}
+  .contact strong{font-size:26px}
+  .contact span:not(.av){font-size:15px}
+  .q,.a{max-width:88%;font-size:16px}
+  .compose{grid-template-columns:1fr;padding:28px 20px;gap:32px}
+  .composer{flex-direction:column}
+  .composer .send{height:54px;justify-content:center}
+  .info{border-left:0;padding-left:0;border-top:1px solid var(--line);padding-top:24px}
+  footer{padding-bottom:110px}
+  .dock{display:flex;position:fixed;left:12px;right:12px;bottom:12px;z-index:40;transform:translateY(140%);transition:transform .35s cubic-bezier(.2,1.2,.4,1)}
+  .dock.show{transform:none}
+  .dock .send{flex:1;justify-content:center;box-shadow:0 14px 30px -12px rgba(204,51,32,.6)}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">跳到主內容</a>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="所見行銷 Sovision 回到頂端"><i aria-hidden="true"></i>所見行銷<small>SOVISION</small></a>
+    <nav aria-label="主要導覽">
+      <a href="#problems">你遇到的問題</a>
+      <a href="#how">怎麼合作</a>
+      <a href="#cases">合作案例</a>
+      <a href="#faq">常見問題</a>
+    </nav>
+    <a class="send" href="https://line.me/R/ti/p/@359rkpnf" target="_blank" rel="noopener">加入官方 LINE</a>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero" id="top">
+    <div class="wrap">
+      <div class="inbox">
+        <div class="inbox-head">
+          <span class="folder">短影音代操・客戶影片底下的留言 <b>4</b></span>
+          <h1><span class="ln"><span>影片發出去，</span></span><span class="ln"><span><b>詢問</b>傳進來。</span></span></h1>
+          <p class="lead">企劃腳本、拍攝剪輯、排程發文到<span class="nw">成效追蹤</span>，所見行銷整套接手。你只要回覆想買的人。</p>
+        </div>
+        <ul class="msgs" aria-label="客戶影片底下的真實留言">
+          <li class="msg new">
+            <div class="vid"><img src="hero-frame-04.jpg" alt="檜木桶業者的短影音"></div>
+            <div><div class="who"><b>台南的觀眾</b>檜木桶影片</div><p class="text">請問浴室空間 170×90，可以選多大的<span class="nw">檜木桶</span>？<span class="nw">大約多少錢</span>？</p></div>
+            <span class="dot" aria-label="未讀"></span>
+          </li>
+          <li class="msg new">
+            <div class="vid"><img src="case-geese-reel.png" alt="美髮店家的吹風機短影音"><span><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4l13 8-13 8z"/></svg>6.2萬</span></div>
+            <div><div class="who"><b>髮廊同業</b>吹風機影片・<span class="nw">6.2 萬次觀看</span></div><p class="text">請問費用？</p></div>
+            <span class="dot" aria-label="未讀"></span>
+          </li>
+          <li class="msg">
+            <div class="vid"><img src="case-wood-reel.png" alt="檜木桶業者介紹貼皮木桶的短影音"></div>
+            <div><div class="who"><b>觀眾</b>檜木桶影片</div><p class="text">木片沒有黏起來不會漏水嗎？有保固嗎？</p></div>
+            <span class="dot"></span>
+          </li>
+          <li class="msg">
+            <div class="vid"><img src="hero-frame-04.jpg" alt="檜木桶業者的短影音"></div>
+            <div><div class="who"><b>觀眾</b>檜木桶影片</div><p class="text">鐵線不會生鏽嗎？</p></div>
+            <span class="dot"></span>
+          </li>
+        </ul>
+        <div class="reply">
+          <div class="field" aria-hidden="true">想讓你的影片也收到這種留言？</div>
+          <a class="link" href="#cases">先看合作案例</a>
+          <a class="send js-hero-send" href="https://line.me/R/ti/p/@359rkpnf" target="_blank" rel="noopener">加 LINE 聊聊<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="problems">
+    <div class="wrap">
+      <div class="sec-head"><h2>不是不想做，<br>是內容一直卡在<span class="nw">草稿匣。</span></h2></div>
+      <p class="drafts-label">草稿匣・5 則還沒送出去</p>
+      <ul class="drafts">
+        <li class="draft"><div class="d-bubble"><span class="d-st"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>卡在第一支</span><h3>學很多，回來還是不知道先拍什麼</h3><p>觀念很多，真正能執行的第一支卻一直沒出來。</p></div></li>
+        <li class="draft"><div class="d-bubble"><span class="d-st"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>卡在開頭</span><h3>拍了幾支，開頭和標題還是抓不準</h3><p>內容不是沒做，是每一支都像重新猜一次。</p></div></li>
+        <li class="draft"><div class="d-bubble"><span class="d-st"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>卡在時間</span><h3>拍片很花力氣，更新卻撐不起來</h3><p>器材、剪輯、時間都在付出，發文還是斷斷續續。</p></div></li>
+        <li class="draft"><div class="d-bubble"><span class="d-st"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>卡在私訊</span><h3>流量有了，真正私訊的人還是少</h3><p>看的人不少，卻沒有順順把人帶進詢問。</p></div></li>
+        <li class="draft"><div class="d-bubble"><span class="d-st"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>卡在整理</span><h3>手上有案例，卻沒人整理成可拍內容</h3><p>不是沒東西，是缺一個人把素材變成發得出去的腳本。</p></div></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="sec" id="how">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>一支影片，怎麼變成<span class="nw"><b>一則詢問</b></span></h2>
+        <p>合作分四步，從你手上的素材開始。</p>
+      </div>
+      <div class="story">
+        <div class="stage-col">
+          <div class="stage" aria-hidden="true">
+            <div class="card js-card">
+              <div class="pile">
+                <span class="t">你手上的素材</span>
+                <div class="grid">
+                  <img src="hero-frame-05.jpg" alt=""><img src="hero-frame-01.jpg" alt="">
+                  <img src="case-wood-reel.png" alt=""><img src="hero-frame-04.jpg" alt="">
+                </div>
+              </div>
+              <div class="script js-script">
+                <span class="t">腳本・檜木桶第 1 支</span>
+                <div class="row"><b>開頭 3 秒</b><span>才用半年？</span></div>
+                <div class="row"><b>中段</b><span>便宜的貼皮木桶，差在哪裡</span></div>
+                <div class="row opt"><b>畫面</b><span>老闆拿著木桶直接入鏡</span></div>
+                <div class="row"><b>結尾</b><span>浴室放得下多大？留言問我們</span></div>
+                <span class="t foot">長度約 30 秒・直式 9:16</span>
+              </div>
+              <div class="video js-video"><img src="hero-frame-04.jpg" alt=""></div>
+              <span class="chip js-chip">排程：週三 19:00 發佈</span>
+              <div class="bubble b1 js-b"><small><i></i>新留言</small>請問浴室空間 170×90，可以選多大的？</div>
+              <div class="bubble b2 js-b"><small><i></i>新留言</small>木片沒有黏起來不會漏水嗎？有保固嗎？</div>
+              <div class="bubble b3 js-b"><small><i></i>新留言</small>鐵線不會生鏽嗎？</div>
+            </div>
+          </div>
+        </div>
+        <ol class="steps">
+          <li class="step on"><span class="no">01</span><h3>先看你現在有什麼素材</h3><p>照片、影片、案例和社群現況，我們先看一遍，挑出可以直接用的。素材不多也能開始。</p><div class="tags">素材整理・社群現況盤點</div></li>
+          <li class="step"><span class="no">02</span><h3>一起定主題，寫好腳本</h3><p>先把會帶來詢問、會成交的題目排進去，再定開頭、切角和拍攝方向。</p><div class="tags">主題整理・腳本設計・拍攝方向</div></li>
+          <li class="step"><span class="no">03</span><h3>拍攝、剪輯、排程發佈</h3><p>拍攝重點、剪輯節奏、字幕一次到位，照固定節奏上架，不再想到才發。</p><div class="tags">拍攝剪輯・字幕上架・發文排程</div></li>
+          <li class="step"><span class="no">04</span><h3>看哪支帶來詢問，再調整</h3><p>每一輪回頭看哪些內容有人留言、私訊，下一輪把力氣放在更有效的方向。</p><div class="tags">成效追蹤・內容優化</div></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="cases">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>比起播放量，<br>我們更在意有沒有<span class="nw">帶來<b>詢問</b>。</span></h2>
+        <p>這裡放的是客戶帳號上的真實畫面：留言、私訊、名單和訂單。</p>
+      </div>
+      <div class="cases">
+        <article class="case wide">
+          <div>
+            <div class="big">1000<sup>+</sup></div>
+            <div class="unit">諮詢名單</div>
+            <div class="tag">旅遊業者</div>
+            <h3>把內容整理好，詢問自然進來</h3>
+            <p>從內容節奏到主題安排一起整理，<span class="nw">社群開始</span>累積穩定的詢問來源。</p>
+          </div>
+          <div class="shots"><figure class="shot wide"><img src="case-travel-reel.png" alt="旅遊業者的短影音與底下的留言" loading="lazy"></figure></div>
+        </article>
+        <article class="case">
+          <div>
+            <div class="big word">高單價</div>
+            <div class="unit">也接到訂製單</div>
+            <div class="tag">檜木桶業者</div>
+            <h3>高單價商品，也能做出有效內容</h3>
+            <p>把產品價值講清楚，客人看懂差在哪裡，直接在留言問尺寸和價格。</p>
+          </div>
+          <div class="shots"><figure class="shot port"><img src="case-wood-comments.jpg" alt="檜木桶影片下方，觀眾詢問尺寸與價格的留言" loading="lazy" style="object-position:bottom"></figure></div>
+        </article>
+        <article class="case">
+          <div>
+            <div class="big">300<sup>+</sup></div>
+            <div class="unit">訂單成果</div>
+            <div class="tag">賣貨轉型</div>
+            <h3>內容一穩，訂單也跟著動起來</h3>
+            <p>讓內容和商品頁、詢問節奏一起配合，成交才會更順。</p>
+          </div>
+          <div class="shots"><figure class="shot tall"><img src="case-beauty-profile.jpg" alt="賣貨轉型客戶的 Instagram 帳號頁面" loading="lazy" style="object-position:top"></figure></div>
+        </article>
+        <article class="case wide flip">
+          <div>
+            <div class="big">200</div>
+            <div class="unit">位客資</div>
+            <div class="tag">美業促銷</div>
+            <h3>一支 Reels，帶來大量主動詢問</h3>
+            <p>限時優惠搭配清楚的行動引導，有興趣的觀眾直接留下資料，進入後續成交。</p>
+          </div>
+          <div class="shots">
+            <figure class="shot port"><img src="case-beauty-leads.jpg" alt="美業促銷短影音畫面" loading="lazy"></figure>
+            <figure class="shot port"><img src="case-beauty-orders.jpg" alt="影片下方「請問費用？」等詢問留言" loading="lazy" style="object-position:top"></figure>
+          </div>
+        </article>
+        <article class="case wide">
+          <div>
+            <div class="big word">破圈</div>
+            <div class="unit">成為室內設計行業 KOC</div>
+            <div class="tag">@chenxin_luke・室內設計</div>
+            <h3>專業內容，也能被圈外人看見</h3>
+            <p>把設計師的專業拍成一般人聽得懂的短影音，讓圈外的人也停下來看、留言討論。</p>
+          </div>
+          <div class="shots">
+            <figure class="shot port"><img src="case-chenxin-video.png" alt="室內設計短影音畫面" loading="lazy"></figure>
+            <figure class="shot port"><img src="case-chenxin-comments.png" alt="室內設計影片的留言區" loading="lazy" style="object-position:top"></figure>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="audience">
+    <div class="wrap">
+      <div class="sec-head"><h2>適合先開始的，<br>通常是這三種人。</h2></div>
+      <ul class="contacts">
+        <li class="contact"><span class="av" aria-hidden="true">店</span><strong>店家老闆</strong><span>想增加店內曝光與來客，但沒有時間經營社群。</span></li>
+        <li class="contact"><span class="av" aria-hidden="true">個</span><strong>個人品牌</strong><span>想打造專業形象，讓更多人認識你的服務與價值。</span></li>
+        <li class="contact"><span class="av" aria-hidden="true">企</span><strong>中小企業</strong><span>需要穩定產出內容，強化品牌存在感與業績成長。</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="sec" id="faq">
+    <div class="wrap">
+      <div class="sec-head"><h2>先把大家常問的，<br>回在這裡。</h2></div>
+      <div class="thread">
+        <p class="q">如果我現在素材不多，也可以開始嗎？</p>
+        <p class="a">可以。我們會先看你現有的照片、影片和案例，把能用的素材整理到位，再慢慢補齊。</p>
+        <p class="q">一定要一次拍很多支影片嗎？</p>
+        <p class="a">不一定。可以先從幾支代表性的內容開始，把節奏跑起來，再依成效補內容。</p>
+        <p class="q">短影音代操會包含哪些工作？</p>
+        <p class="a">腳本、拍攝、剪輯、發佈節奏和成效整理。實際範圍會依你的需求調整。</p>
+        <p class="q">我們比較適合哪一種合作方式？</p>
+        <p class="a">想省下內容製作時間，適合代操；想讓團隊自己也做得起來，可以從行銷陪跑或企業內訓開始。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="contact">
+    <div class="wrap">
+      <div class="compose">
+        <div>
+          <h2>想先聊合作方式，<br>就從這裡開始。</h2>
+          <p class="desc">先傳品牌狀況、目前的素材或想做的方向，我們一起看怎麼開始。</p>
+          <div class="quick" role="group" aria-label="常用開場白">
+            <button type="button" aria-pressed="false">我素材不多，想先聊聊</button>
+            <button type="button" aria-pressed="false">想了解代操的費用</button>
+            <button type="button" aria-pressed="false">想看跟我同行業的案例</button>
+          </div>
+          <form class="composer js-composer" action="https://line.me/R/ti/p/@359rkpnf" target="_blank">
+            <label class="sr" for="msg">想傳給我們的訊息</label>
+            <textarea id="msg" name="msg" placeholder="例如：我們是台南的檜木桶工廠，想開始拍短影音"></textarea>
+            <button class="send" type="submit">用 LINE 傳送<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+          </form>
+          <p class="hint" id="hint">按下傳送會打開 LINE，訊息會先幫你填好，確認後再送出。</p>
+        </div>
+        <ul class="info">
+          <li><small>官方 LINE</small><a class="link" href="https://line.me/R/ti/p/@359rkpnf" target="_blank" rel="noopener">@359rkpnf</a></li>
+          <li><small>聯絡信箱</small><a class="link" href="mailto:sovision1617@gmail.com">sovision1617@gmail.com</a></li>
+          <li><small>服務單位</small><b>所見行銷科技有限公司</b></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="mark" aria-hidden="true">所見行銷<i></i></div>
+    <div class="foot"><span>© 2026 所見行銷 Sovision</span><span>短影音代操｜行銷陪跑｜企業內訓</span></div>
+    <p class="legal"><span class="nw">所見行銷科技有限公司</span><span aria-hidden="true">｜</span><span class="nw">統一編號 62227827</span><span aria-hidden="true">｜</span><span class="nw">臺中市西屯區文心路三段76號2樓</span></p>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="dock"><a class="send" href="https://line.me/R/ti/p/@359rkpnf" target="_blank" rel="noopener">加 LINE 聊聊<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/Flip.min.js"></script>
+<script>
+(() => {
+  const LINE_ID = '@359rkpnf';
+
+  /* 傳送鍵：按下後箭頭往右飛出去 */
+  document.querySelectorAll('.send').forEach(b => b.addEventListener('click', () => {
+    b.classList.remove('sent'); void b.offsetWidth; b.classList.add('sent');
+  }));
+
+  /* 聯絡區：點開場白填進輸入框，送出時用 LINE 開啟並帶入訊息 */
+  const box = document.getElementById('msg');
+  const chips = document.querySelectorAll('.quick button');
+  chips.forEach(c => c.addEventListener('click', () => {
+    chips.forEach(x => x.setAttribute('aria-pressed', x === c ? 'true' : 'false'));
+    box.value = c.textContent; box.focus();
+  }));
+  const isPhone = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const addUrl = 'https://line.me/R/ti/p/' + LINE_ID;
+  const toast = document.getElementById('toast');
+  const say = msg => { toast.textContent = msg; toast.classList.add('show'); clearTimeout(say.t); say.t = setTimeout(() => toast.classList.remove('show'), 3200); };
+  if (!isPhone) document.getElementById('hint').textContent = '在電腦上按傳送，會先幫你複製這段訊息，再打開所見行銷的 LINE 官方帳號；加好友後貼上就能送出。';
+  document.querySelector('.js-composer').addEventListener('submit', e => {
+    e.preventDefault();
+    const text = box.value.trim();
+    if (isPhone) {
+      window.open(text ? 'https://line.me/R/oaMessage/' + LINE_ID + '/?' + encodeURIComponent(text) : addUrl, '_blank', 'noopener');
+      return;
+    }
+    let copied = false;
+    if (text) { box.select(); try { copied = document.execCommand('copy'); } catch (err) {} }
+    window.open(addUrl, '_blank', 'noopener');
+    if (copied) say('訊息已複製，加好友後貼上就能送出');
+  });
+
+  /* 手機常駐傳送鍵：首屏的傳送鍵不在畫面裡時出現，捲到聯絡區時收起 */
+  const dock = document.querySelector('.dock');
+  if ('IntersectionObserver' in window) {
+    let heroOff = true, nearEnd = false;
+    const upd = () => dock.classList.toggle('show', heroOff && !nearEnd);
+    new IntersectionObserver(([e]) => { heroOff = !e.isIntersecting; upd(); }).observe(document.querySelector('.js-hero-send'));
+    new IntersectionObserver(([e]) => { nearEnd = e.isIntersecting; upd(); }).observe(document.getElementById('contact'));
+  } else { dock.classList.add('show'); }
+
+  if (!window.gsap) return;
+  gsap.registerPlugin(ScrollTrigger);
+  if (window.Flip) gsap.registerPlugin(Flip);
+  const mm = gsap.matchMedia();
+
+  mm.add('(prefers-reduced-motion: no-preference)', () => {
+    /* 第一次進入：標題升起，留言一則一則進來 */
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+    tl.from('h1 .ln span', { yPercent: 110, duration: .7, stagger: .1 })
+      .from('.lead, .folder', { y: 12, opacity: 0, duration: .45 }, '-=.4')
+      .from('.msg', { y: -20, opacity: 0, duration: .4, stagger: .1, ease: 'back.out(1.6)' }, '-=.25')
+      .from('.new .dot', { scale: 0, duration: .3, stagger: .08, ease: 'back.out(3)' }, '-=.2');
+
+    /* 狀態切換有來路：幾秒後再進來一則新留言，其他留言讓位，最舊的一則退出 */
+    const list = document.querySelector('.msgs');
+    const badge = document.querySelector('.folder b');
+    if (window.Flip) gsap.delayedCall(4, () => {
+      const desktop = window.matchMedia('(min-width: 901px)').matches;
+      const li = document.createElement('li');
+      li.className = 'msg new';
+      li.innerHTML = '<div class="vid"><img src="case-geese-reel.png" alt="美髮店家的吹風機短影音"></div><div><div class="who"><b>美髮店家</b>吹風機影片</div><p class="text">想了解</p></div><span class="dot" aria-label="未讀"></span>';
+      if (desktop) {
+        gsap.to('.msg', { opacity: 0, y: 6, duration: .2, ease: 'power2.in', onComplete: () => {
+          list.prepend(li); list.lastElementChild.remove();
+          gsap.fromTo('.msg', { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: .35, stagger: .06, ease: 'power3.out' });
+          gsap.fromTo(li.querySelector('.dot'), { scale: 0 }, { scale: 1, duration: .4, delay: .1, ease: 'back.out(3)' });
+        } });
+      } else {
+      list.style.height = list.offsetHeight + 'px'; list.style.overflow = 'hidden';
+      list.classList.add('swap');
+      const state = Flip.getState('.msg');
+      list.prepend(li);
+      Flip.from(state, { duration: .6, ease: 'power3.inOut',
+        onEnter: els => gsap.fromTo(els, { opacity: 0, y: -24, scale: .96 }, { opacity: 1, y: 0, scale: 1, duration: .5, delay: .1, ease: 'back.out(1.6)' }),
+        onComplete: () => { list.lastElementChild.remove(); list.classList.remove('swap'); list.style.height = ''; list.style.overflow = ''; } });
+      }
+      badge.textContent = '5';
+      gsap.fromTo(badge, { scale: 1.5 }, { scale: 1, duration: .45, ease: 'back.out(3)' });
+    });
+
+    /* 草稿：一則一則從左邊打出來，像剛存進草稿匣 */
+    gsap.from('.d-bubble', { x: -30, opacity: 0, duration: .5, stagger: .08, ease: 'power3.out',
+      scrollTrigger: { trigger: '.drafts', start: 'top 80%', once: true } });
+
+    /* 主敘事：素材 → 腳本 → 影片 → 排程 → 留言進來（跟著捲動走，往回捲會倒放） */
+    gsap.set('.js-chip', { y: 10 });
+    gsap.set('.js-b', { opacity: 0, x: 30, scale: .9 });
+    /* 每一步自己帶動卡片：說明捲到哪一步，卡片才換到那一步 */
+    const stepEls = gsap.utils.toArray('.step');
+    const scene = (i, build) => {
+      const t = gsap.timeline({ defaults: { ease: 'none' } });
+      build(t);
+      ScrollTrigger.create({ trigger: stepEls[i], start: 'top 60%', end: 'top 35%', scrub: .5, animation: t });
+    };
+    scene(1, t => t.to('.js-script', { clipPath: 'inset(0% 0 0 0)', duration: .6, ease: 'power2.out' })
+      .from('.js-script .row', { opacity: 0, x: -10, stagger: .1, duration: .3 }, .3));
+    scene(2, t => t.to('.js-video', { clipPath: 'inset(0% 0 0 0)', duration: .7, ease: 'power2.out' })
+      .to('.js-chip', { opacity: 1, y: 0, duration: .3, ease: 'back.out(2)' }, .6));
+    scene(3, t => t.to('.js-card', { scale: .94, duration: .3 })
+      .to('.js-b', { opacity: 1, x: 0, scale: 1, stagger: .25, duration: .4, ease: 'back.out(1.8)' }, 0));
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => ScrollTrigger.refresh());
+
+    const steps = gsap.utils.toArray('.step');
+    steps.forEach((s, i) => ScrollTrigger.create({ trigger: s, start: 'top 60%', end: 'bottom 60%',
+      onToggle: self => { if (self.isActive) steps.forEach((x, j) => x.classList.toggle('on', j === i)); } }));
+
+    /* 案例：真實截圖由下往上揭開、輕輕回縮；數字整個落下定位，不跳動 */
+    gsap.utils.toArray('.case').forEach(c => {
+      const t = gsap.timeline({ scrollTrigger: { trigger: c, start: 'top 80%', once: true } });
+      t.from(c.querySelectorAll('.shot'), { clipPath: 'inset(100% 0 0 0)', duration: .8, stagger: .08, ease: 'power3.out' })
+       .from(c.querySelectorAll('.shot img'), { scale: 1.08, duration: 1, ease: 'power3.out' }, 0)
+       .from(c.querySelector('.big'), { y: -30, opacity: 0, duration: .55, ease: 'back.out(2)' }, .05)
+       .from(c.querySelectorAll('.unit, .tag, h3, p'), { y: 14, opacity: 0, duration: .45, stagger: .05, ease: 'power3.out' }, .15);
+    });
+
+    /* 聯絡人：一列一列滑入 */
+    gsap.from('.contact', { y: 24, opacity: 0, duration: .5, stagger: .1, ease: 'power3.out',
+      scrollTrigger: { trigger: '.contacts', start: 'top 80%', once: true } });
+
+    /* 常見問題：問題送出 → 對方輸入中… → 回答出現 */
+    const thread = document.querySelector('.thread');
+    const ft = gsap.timeline({ scrollTrigger: { trigger: thread, start: 'top 75%', once: true } });
+    thread.querySelectorAll('.q').forEach(q => {
+      const a = q.nextElementSibling;
+      const dots = document.createElement('div');
+      dots.className = 'typing'; dots.setAttribute('aria-hidden', 'true'); dots.innerHTML = '<i></i><i></i><i></i>';
+      a.before(dots);
+      gsap.set(a, { opacity: 0 });
+      ft.from(q, { y: 14, scale: .96, transformOrigin: '100% 100%', opacity: 0, duration: .3, ease: 'back.out(1.6)' })
+        .set(dots, { display: 'flex' }, '+=.08')
+        .from(dots, { opacity: 0, scale: .8, transformOrigin: '0 100%', duration: .15 })
+        .set(dots, { display: 'none' }, '+=.45')
+        .fromTo(a, { opacity: 0, scale: .94, transformOrigin: '0 100%' }, { opacity: 1, scale: 1, duration: .3, ease: 'back.out(1.8)' }, '<');
+    });
+  });
+
+  mm.add('(prefers-reduced-motion: reduce)', () => {
+    gsap.set('.js-script, .js-video', { clipPath: 'inset(0% 0 0 0)' });
+    gsap.set('.js-chip, .js-b', { opacity: 1 });
+  });
+})();
+</script>
+</body>
+</html>
