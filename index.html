@@ -430,6 +430,19 @@ footer{margin-top:120px;padding:0 0 40px}
             <figure class="shot port"><img src="case-beauty-orders.jpg" alt="影片下方「請問費用？」等詢問留言" loading="lazy" style="object-position:top"></figure>
           </div>
         </article>
+        <article class="case wide flip">
+          <div>
+            <div class="big">571</div>
+            <div class="unit">則留言</div>
+            <div class="tag">業務培訓・個人品牌</div>
+            <h3>一支 Reels，571 人留言要指南</h3>
+            <p>開頭直接說能拿到什麼，結尾請觀眾留關鍵字領取，<span class="nw">想學的人</span>自己舉手，名單一次收進來。</p>
+          </div>
+          <div class="shots">
+            <figure class="shot port"><img src="case-manman-video.jpg" alt="業務培訓短影音：超級業務的作弊指南" loading="lazy"></figure>
+            <figure class="shot port"><img src="case-manman-comments.jpg" alt="影片下方大量留言「指南」" loading="lazy" style="object-position:top"></figure>
+          </div>
+        </article>
         <article class="case wide">
           <div>
             <div class="big word">破圈</div>
@@ -581,7 +594,7 @@ footer{margin-top:120px;padding:0 0 40px}
       const desktop = window.matchMedia('(min-width: 901px)').matches;
       const li = document.createElement('li');
       li.className = 'msg new';
-      li.innerHTML = '<div class="vid"><img src="case-geese-reel2.jpg" alt="美髮店家的吹風機短影音"></div><div><div class="who"><b>美髮店家</b>吹風機影片</div><p class="text">想了解</p></div><span class="dot" aria-label="未讀"></span>';
+      li.innerHTML = '<div class="vid"><img src="case-manman-video.jpg" alt="業務培訓的短影音"></div><div><div class="who"><b>業務新人</b>業務培訓影片・<span class="nw">571 則留言</span></div><p class="text">指南</p></div><span class="dot" aria-label="未讀"></span>';
       if (desktop) {
         gsap.to('.msg', { opacity: 0, y: 6, duration: .2, ease: 'power2.in', onComplete: () => {
           list.prepend(li); list.lastElementChild.remove();
